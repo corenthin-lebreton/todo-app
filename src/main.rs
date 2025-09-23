@@ -1,7 +1,7 @@
 use colored::*;
 
 fn main() {
-    pri("{}", "Hello, Corenthin L".green().bold());
+    println!("{}", "Hello, Corenthin L".green().bold());
     println!("{}", "=== Footer ===".red());
     println!("{}", "Contact: contact@todo-app.dev".blue());
 
