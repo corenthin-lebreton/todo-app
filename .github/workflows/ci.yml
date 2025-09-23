@@ -1,24 +1,29 @@
-name: "CI"
+name: CI
 
 on:
   push:
-    branches:
-      - dev
+    branches: ["dev"]
   pull_request:
-    branches:
-      - dev
+    branches: ["dev"]
 
 jobs:
-  build:
+  build-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Install Rust
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer l’environnement Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
-      - name: Build
+
+      - name: Installer les dépendances
+        run: cargo fetch
+
+      - name: Lancer la vérification (build)
         run: cargo build --verbose
-      - name: Run tests
+
+      - name: Lancer les tests unitaires
         run: cargo test --verbose
