@@ -27,3 +27,24 @@ jobs:
 
       - name: Lancer les tests unitaires
         run: cargo test --verbose
+
+      - name: Envoyer notification Discord (succès)
+        if: success()
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{
+                 \"content\": \"✅ Workflow **${{ github.workflow }}** réussi !\n🔹 Branche: ${{ github.ref_name }}\n👤 Auteur: ${{ github.actor }}\n🔗 Lien: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
+               }" \
+               ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+
+      - name: Envoyer notification Discord (échec)
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{
+                 \"content\": \"❌ Workflow **${{ github.workflow }}** échoué !\n🔹 Branche: ${{ github.ref_name }}\n👤 Auteur: ${{ github.actor }}\n🔗 Lien: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}\"
+               }" \
+               ${{ secrets.DISCORD_WEBHOOK_URL }}
