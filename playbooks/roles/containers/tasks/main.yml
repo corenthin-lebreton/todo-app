@@ -1,0 +1,5 @@
+---
+
+- import_tasks: docker.yml
+- import_tasks: container.yml
+- import_tasks: app.yml

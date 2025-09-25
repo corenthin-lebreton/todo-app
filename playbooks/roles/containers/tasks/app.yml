@@ -1,0 +1,46 @@
+---
+- name: Update apt inside container
+  community.docker.docker_container_exec:
+    container: "{{ container_name }}"
+    command: bash -lc "apt update -y"
+
+- name: Install extra dependencies inside container
+  community.docker.docker_container_exec:
+    container: "{{ container_name }}"
+    command: >
+      bash -lc "apt install -y git pkg-config libssl-dev"
+
+- name: Add cargo to global PATH
+  community.docker.docker_container_exec:
+    container: "{{ container_name }}"
+    command: >
+      bash -lc 'echo "export PATH=/usr/local/cargo/bin:$PATH" > /etc/profile.d/cargo.sh'
+
+- name: Check if app dir exists inside container
+  community.docker.docker_container_exec:
+    container: "{{ container_name }}"
+    command: bash -lc "[ -d {{ app_dir }} ]"
+  register: app_dir_exists
+  ignore_errors: true
+
+- name: Clone GitHub repository inside container if not present
+  community.docker.docker_container_exec:
+    container: "{{ container_name }}"
+    command: bash -lc "git clone {{ repo_url }} {{ app_dir }}"
+  when: app_dir_exists.rc != 0
+
+- name: Update GitHub repository inside container if already present
+  community.docker.docker_container_exec:
+    container: "{{ container_name }}"
+    command: bash -lc "cd {{ app_dir }} && git pull"
+  when: app_dir_exists.rc == 0
+
+- name: Build Rust project in release mode
+  community.docker.docker_container_exec:
+    container: "{{ container_name }}"
+    command: bash -lc "cd {{ app_dir }} && cargo build --release"
+
+- name: Run Rust binary
+  community.docker.docker_container_exec:
+    container: "{{ container_name }}"
+    command: bash -lc "cd {{ app_dir }} && ./target/release/todo-app"

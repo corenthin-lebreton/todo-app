@@ -1,0 +1,30 @@
+---
+
+- name: Verifier si Docker est installe
+  command: docker --version
+  register: docker_version
+  ignore_errors: yes
+  changed_when: false
+
+
+- name: Afficher la version de Docker si presente
+  debug:
+    msg: "Docker est déjà installé : {{ docker_version.stdout }}"
+  when: docker_version.rc == 0
+
+- name: Installer Docker sur Debian/Ubuntu si absent
+  apt:
+    name: docker.io
+    state: present
+    update_cache: yes
+  when:
+    - docker_version.rc != 0
+    - ansible_facts['os_family'] == "Debian"
+    - ansible_facts['distribution'] in ["Debian", "Ubuntu"]
+
+
+- name: Verifier que le service Docker est actif
+  systemd:
+    name: docker
+    state: started
+    enabled: yes

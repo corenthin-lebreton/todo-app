@@ -1,0 +1,15 @@
+---
+- name: Run Rust container
+  community.docker.docker_container:
+    name: "{{ container_name }}"
+    image: "{{ image_name }}"
+    state: started
+    tty: true
+    interactive: true
+    restart_policy: always
+    command: "sleep infinity"
+    networks:
+      - name: bridge
+    dns_servers:
+      - 8.8.8.8
+      - 1.1.1.1

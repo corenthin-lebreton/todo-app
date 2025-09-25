@@ -1,0 +1,9 @@
+---
+- name: Deploiement via ansible
+  hosts: aws
+  become: yes
+  gather_facts: yes
+  roles:
+    - AWS
+    # - containers
+  

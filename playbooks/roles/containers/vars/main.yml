@@ -1,0 +1,4 @@
+container_name: "debian_rust"
+image_name: "rust:trixie"
+repo_url: "https://github.com/corenthin-lebreton/todo-app"
+app_dir: "/app"

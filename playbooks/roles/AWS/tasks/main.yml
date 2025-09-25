@@ -1,0 +1,27 @@
+---
+- name: Update apt
+  become: true
+  ansible.builtin.apt:
+    update_cache: true
+
+- name: Install apache2
+  become: true
+  ansible.builtin.apt:
+    name: apache2
+    state: present
+
+- name: Ensure Nginx is running
+  become: true
+  ansible.builtin.service:
+    name: apache2
+    state: started
+    enabled: true
+
+- name: Deploy index.html template
+  become: true
+  ansible.builtin.template:
+    src: "{{ index_template }}"
+    dest: "{{ web_root }}/index.html"
+    owner: www-data
+    group: www-data
+    mode: '0644'

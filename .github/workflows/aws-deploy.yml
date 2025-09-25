@@ -1,0 +1,29 @@
+name: AWS Deploy
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create AWS key file
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.AWS_SSH_KEY}}" > ~/.ssh/aws_key.pem
+          chmod 600 ~/.ssh/aws_key.pem
+
+      - name: Run Ansible playbook
+        run: ANSIBLE_CONFIG=playbooks/ansible.cfg ansible-playbook playbooks/main.yml \
+          --key-file ~/.ssh/aws_key.pem \
+
+      - name: Cleanup AWS key
+        if: always()
+        run: rm -f ~/.ssh/aws_key.pem
