@@ -20,8 +20,13 @@ jobs:
           echo "${{ secrets.AWS_SSH_KEY}}" > ~/.ssh/aws_key.pem
           chmod 600 ~/.ssh/aws_key.pem
 
+      - name: Create Ansible Vault password file
+        run: |
+          echo "${{ secrets.ANSIBLE_VAULT }}" > ~/.ssh/vault_pass.txt
+          chmod 600 ~/.ssh/vault_pass.txt
+
       - name: Run Ansible playbook
-        run: ANSIBLE_CONFIG=playbooks/ansible.cfg ansible-playbook playbooks/main.yml
+        run: ANSIBLE_CONFIG=playbooks/ansible.cfg ansible-playbook playbooks/main.yml --vault-password-file ~/.ssh/vault_pass.txt
 
       - name: Cleanup AWS key
         if: always()
